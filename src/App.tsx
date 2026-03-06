@@ -1,54 +1,43 @@
-import { Authenticator } from '@aws-amplify/ui-react'
-import { StorageManagerComponent } from './components/StorageManager';
-import '@aws-amplify/ui-react/styles.css'
-import Container from 'react-bootstrap/Container';
-import { Grid, Card, Heading, Image, Button, Flex, View} from '@aws-amplify/ui-react';
-import TabListComponent from './components/TabsList';
-
+import { StorageManagerComponent } from "./components/StorageManager";
+import "@aws-amplify/ui-react/styles.css";
+import { Grid, Card, Heading, Image, Flex, View } from "@aws-amplify/ui-react";
+import TabListComponent from "./components/TabsList";
 
 function App() {
   return (
-    <Authenticator socialProviders={['google']}>
-      {({ signOut, user }) => (
-        <Container className="container-fluid">
-          <Grid
-            columnGap="0.5rem"
-            rowGap="0.5rem"
-            templateColumns="1fr 1fr 1fr"
-            templateRows="0.5fr 3fr 1fr"
-          >
-            <Card
-              columnStart="1"
-              columnEnd="-1"
-            >
-              <View style={{marginBottom: '0rem'}}>
-              <Flex direction="row" justifyContent="space-around">
-                <Image
-                  src="/react.svg"
-                  alt="React Logo"
-                />
-                <Heading level={6}>Welcome, {user?.signInDetails?.loginId}! </Heading>
-                <Button size='small' borderRadius='medium' colorTheme='warning' onClick={signOut}>Sign Out</Button>
+    <View
+      style={{
+        minHeight: "100vh",
+        padding: "24px",
+        background: "linear-gradient(180deg, #7d5bd6 0%, #d8d1e8 100%)",
+      }}
+    >
+      <View style={{ maxWidth: "1150px", margin: "0 auto" }}>
+        <Grid
+          columnGap="16px"
+          rowGap="16px"
+          templateColumns="340px 1fr"
+          templateRows="auto 1fr"
+        >
+          <Card columnStart="1" columnEnd="-1" padding="16px">
+            <View>
+              <Flex direction="row" justifyContent="center" alignItems="center">
+                <Image src="/react.svg" alt="React Logo" />
+                <Heading level={5}>Serverless Image Storage System</Heading>
               </Flex>
-              </View>
-              
-            </Card>
-            <Card
-              columnStart="1"
-              columnEnd="2"
-            >
-              <StorageManagerComponent />
-            </Card>
-            <Card
-              columnStart="2"
-              columnEnd="-1"
-            >
-              <TabListComponent />
-            </Card>
-          </Grid>
-        </Container>
-      )}
-    </Authenticator>
+            </View>
+          </Card>
+
+          <Card padding="20px">
+            <StorageManagerComponent />
+          </Card>
+
+          <Card padding="20px">
+            <TabListComponent />
+          </Card>
+        </Grid>
+      </View>
+    </View>
   );
 }
 

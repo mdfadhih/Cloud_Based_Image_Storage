@@ -1,95 +1,178 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { list } from 'aws-amplify/storage';
-import { Card, Collection, SearchField, Text} from '@aws-amplify/ui-react';
-import { StorageImage } from '@aws-amplify/ui-react-storage';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Button, Flex } from "@aws-amplify/ui-react";
 
 export const PhotosListComponent = () => {
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [value, setValue] = useState('');
+  const [photos, setPhotos] = useState<string[]>([]); // presigned thumbnail URLs
+  const [value, setValue] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const getImagesFromTagsUrl = "https://kozvlrkmqcuciysoyk6f6vtjku0ojsem.lambda-url.ap-southeast-2.on.aws/"; 
- 
-  const onChange = (event: any) => {
-    setValue(event.target.value);
-    if (event.target.value.length > 2) {
-      search(event.target.value);
-    }
-  };
+  const searchUrl = import.meta.env.VITE_SEARCH_URL;
+  const listUrl = import.meta.env.VITE_LIST_URL;
+  const thumbUrlApi = import.meta.env.VITE_THUMB_URL;
 
+  // Step A: Load ALL images on first page load
   useEffect(() => {
-    listPhotos();
+    loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function search(tagsInput: string) {
-    const tags = tagsInput.split(',').map(tag => tag.trim());
-    if (!Array.isArray(tags) || tags.length === 0) {
+  async function presignThumbUrls(keys: string[]) {
+    if (!thumbUrlApi) throw new Error("Missing VITE_THUMB_URL");
+    const urls = await Promise.all(
+      keys.map(async (key) => {
+        const r = await axios.get(
+          `${thumbUrlApi}?key=${encodeURIComponent(key)}`,
+        );
+        return r.data.url;
+      }),
+    );
+    return urls.filter(Boolean);
+  }
+
+  async function loadAll() {
+    if (!listUrl) {
+      console.error("Missing VITE_LIST_URL");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.get(`${listUrl}?userid=testuser`);
+      const keys: string[] = res.data.keys ?? [];
+      const urls = await presignThumbUrls(keys);
+      setPhotos(urls);
+    } catch (e) {
+      console.error(e);
+      setPhotos([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Step B: Search when user types (debounce)
+  useEffect(() => {
+    const trimmed = value.trim();
+
+    // if search box cleared, show all again
+    if (trimmed.length === 0) {
+      loadAll();
       return;
     }
 
-    let photosArray: string[] = [];
-    const queryParams = tags.map((tag, index) => `tag${index + 1}=${encodeURIComponent(tag)}`).join('&');
-    const url = `${getImagesFromTagsUrl}?${queryParams}`;
-  
+    // only search if 3+ chars
+    if (trimmed.length < 3) return;
+
+    const t = setTimeout(() => {
+      search(trimmed);
+    }, 350);
+
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  async function search(tagsInput: string) {
+    if (!searchUrl) {
+      console.error("Missing VITE_SEARCH_URL");
+      return;
+    }
+
+    const tags = tagsInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    if (tags.length === 0) return;
+
+    const queryParams = tags
+      .map((tag, index) => `tag${index + 1}=${encodeURIComponent(tag)}`)
+      .join("&");
+
+    setLoading(true);
     try {
-      const response = await axios.get(url);
-      response.data.links.forEach((link: string) => photosArray.push(link));
-      setPhotos(photosArray);
-    } catch (error) {
-      console.error(error);
+      const res = await axios.get(`${searchUrl}?${queryParams}`);
+      const keys: string[] = res.data.keys ?? res.data.links ?? [];
+      const urls = await presignThumbUrls(keys);
+      setPhotos(urls);
+    } catch (e) {
+      console.error(e);
+      setPhotos([]);
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function listPhotos() {
-    setValue('');
-    try {
-      let photosArray: string[] = [];
-      const result = await list({
-        path: ({ identityId }) => `thumbnails/protected/${identityId}/`,
-      });
-    
-      result.items.forEach((item) => photosArray.push(item.path));
-      setPhotos(photosArray);
-    } catch (error) {
-      console.log(error);
-    }
+  function clear() {
+    setValue("");
+    // loadAll will run automatically because value becomes ""
   }
-  
+
   return (
     <>
-      <SearchField
-        label="search"
-        placeholder="Search objects"
-        onChange={onChange}
-        onClear={listPhotos}
+      <input
+        placeholder="Search tags (comma separated), e.g. care,map"
         value={value}
+        onChange={(e) => setValue(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          marginBottom: "12px",
+        }}
       />
-      <br/>
 
-    
-      <Collection
-        items={photos}
-        type="list"
-        direction="row"
-        gap="20px"
-        wrap="nowrap"
-        searchNoResultsFound= {
-          <Text color="blue.80" fontSize="1rem" fontFamily='sans-serif' textAlign='center' fontWeight='semibold'>
-          Nothing found, please try again
-        </Text>
-        }
-       
-      >
-        {(item, index) => (
-          <Card key={index} padding="0rem"  maxWidth="10rem" borderRadius="medium" >
-            <StorageImage path={item} alt='image' />
-          </Card>
-        )}
-      </Collection>  
+      <Flex direction="row" gap="small" style={{ marginBottom: "12px" }}>
+        {/* <Button
+          onClick={clear}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          Clear
+        </Button> */}
+
+        <Button
+          onClick={loadAll}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          Refresh
+        </Button>
+      </Flex>
+
+      {loading && <div style={{ marginBottom: 10 }}>Loading…</div>}
+
+      <div style={{ overflowX: "auto" }}>
+        <div style={{ display: "flex", gap: 20 }}>
+          {photos.length === 0 && !loading ? (
+            <div>Nothing found, please try again</div>
+          ) : (
+            photos.map((url, index) => (
+              <div key={index} style={{ width: 160, flex: "0 0 auto" }}>
+                <img
+                  src={url}
+                  alt="thumb"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    display: "block",
+                    borderRadius: 8,
+                  }}
+                />
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </>
   );
 };
 
 export default PhotosListComponent;
-
-
