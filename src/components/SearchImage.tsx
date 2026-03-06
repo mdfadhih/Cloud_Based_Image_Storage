@@ -19,8 +19,8 @@ export const SearchImageComponent = ({ isActive }: SearchImageProps) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [fullSizeImageUrl, setFullSizeImageUrl] = useState("");
-  const [selectedKey, setSelectedKey] = useState("");
+  const [, setFullSizeImageUrl] = useState("");
+  const [, setSelectedKey] = useState("");
 
   const searchByImageUrl = import.meta.env.VITE_SEARCH_IMAGE_URL;
   const thumbUrlApi = import.meta.env.VITE_THUMB_URL;

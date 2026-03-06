@@ -101,11 +101,6 @@ export const PhotosListComponent = () => {
     }
   }
 
-  function clear() {
-    setValue("");
-    // loadAll will run automatically because value becomes ""
-  }
-
   return (
     <>
       <input

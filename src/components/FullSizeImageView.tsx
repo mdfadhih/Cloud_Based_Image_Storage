@@ -17,7 +17,7 @@ const THUMB_URL = import.meta.env.VITE_THUMB_URL;
 export const FullSizeImageComponent = () => {
   const [fullSizeImageUrl, setFullSizeImageUrl] = useState("");
   const [thumbnailPath, setThumbnailPath] = useState("");
-  const [message, setMessage] = useState("");
+  const [, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [photos, setPhotos] = useState<{ key: string; url: string }[]>([]);
   const [selectedKey, setSelectedKey] = useState("");
