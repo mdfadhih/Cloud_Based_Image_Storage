@@ -23,7 +23,7 @@ https://serverless-image-storage.vercel.app
 
 ## ServerlessCover Image
 
-https://github.com/mdfadhih/Cloud_Based_Image_Storage/tree/main/src/assets/Images/screenshots/serverless_cover.png
+<img src="screenshots/serverless_cover.png" width="700">
 
 ## Search by Tags
 
