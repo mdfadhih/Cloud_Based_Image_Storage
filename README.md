@@ -21,9 +21,9 @@ https://serverless-image-storage.vercel.app
 
 # Project Screenshots
 
-## Upload Image
+## ServerlessCover Image
 
-![Upload Screenshot](screenshots/upload.png)
+https://github.com/mdfadhih/Cloud_Based_Image_Storage/tree/main/src/assets/Images/screenshots/serverless_cover.png
 
 ## Search by Tags
 
