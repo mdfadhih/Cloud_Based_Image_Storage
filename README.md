@@ -27,21 +27,25 @@ https://serverless-image-storage.vercel.app
 
 ## Search by Tags
 
-![Search Screenshot](screenshots/search.png)
+<img src="src/assets/Images/screenshots/Tag.png" width="700" />
 
 ## Edit Tags
 
-![Edit Screenshot](screenshots/edit-tags.png)
+<img src="src/assets/Images/screenshots/edit-tags.png" width="700" />
 
 ## Delete Image
 
-![Delete Screenshot](screenshots/delete.png)
+<img src="src/assets/Images/screenshots/delete.png" width="700" />
+
+## ViewByImageUrl Image
+
+<img src="src/assets/Images/screenshots/imageurl.png" width="700" />
 
 ---
 
 # AWS Architecture Diagram
 
-![Architecture Diagram](architecture/serverless-architecture.png)
+<img src="src/assets/Images/architecture/architecture.png" width="700" />
 
 ---
 
