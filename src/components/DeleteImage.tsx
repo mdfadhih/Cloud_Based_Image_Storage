@@ -172,6 +172,14 @@ export const DeleteImageComponent = () => {
         >
           Delete Image
         </Button>
+        <Button
+          size="small"
+          borderRadius="medium"
+          colorTheme="warning"
+          onClick={loadAll}
+        >
+          Refresh
+        </Button>
       </Flex>
 
       <Heading
