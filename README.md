@@ -23,7 +23,7 @@ https://serverless-image-storage.vercel.app
 
 ## ServerlessCover Image
 
-<img src="screenshots/serverless_cover.png" width="700" />
+<img src="src/assets/images/serverless/serverless_cover.png" width="700" />
 
 ## Search by Tags
 
